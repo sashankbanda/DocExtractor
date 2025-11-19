@@ -21,7 +21,7 @@ export default function App() {
           <div className="logo">DE</div>
           <div>
             <h1 className="text-lg font-semibold m-0 leading-tight">Document Extractor</h1>
-            <p className="text-xs text-muted m-0">Dark theme guide</p>
+            <p className="text-xs text-muted m-0">Data Xtractor</p>
           </div>
         </div>
         <div className="flex gap-2">

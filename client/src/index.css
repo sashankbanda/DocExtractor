@@ -10,6 +10,7 @@ body {
   font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
+/* --- Shared Layouts --- */
 .logo {
   width: 36px;
   height: 36px;
@@ -29,6 +30,18 @@ body {
   border: 1px solid #334155;
 }
 
+.screen1, .screen5 {
+  max-width: 600px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.screen3 {
+  width: 100%;
+  height: calc(100vh - 140px);
+}
+
+/* --- Buttons --- */
 .btn {
   padding: 10px 16px;
   border-radius: 10px;
@@ -36,6 +49,9 @@ body {
   cursor: pointer;
   font-weight: 600;
   font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .btn-primary {
@@ -49,6 +65,12 @@ body {
   background: #1D4ED8;
 }
 
+.btn-primary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
 .btn-secondary-action {
   background: #1E293B;
   color: #F8FAFC;
@@ -60,3 +82,298 @@ body {
   background: #334155;
 }
 
+.btn-small-manual {
+    background: transparent;
+    border: 1px solid #3B82F6;
+    color: #3B82F6;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-small-manual:hover {
+    background: rgba(59, 130, 246, 0.1);
+}
+
+/* --- Upload Card Styles (Fixes your screenshot) --- */
+.upload-card {
+    padding: 2rem;
+    min-height: 400px;
+    display: flex;
+    flex-direction: column;
+}
+
+.drag-drop-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    border-color: #334155;
+    padding: 2rem;
+    text-align: center;
+    background-color: rgba(30, 41, 59, 0.5);
+    cursor: pointer;
+}
+
+.upload-text {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.support-text {
+    color: #94A3B8;
+    font-size: 0.875rem;
+    margin-bottom: 1.5rem;
+}
+
+.files-list-container {
+    margin-top: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.file-item-full {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: #0F172A;
+    padding: 0.75rem;
+    border-radius: 8px;
+    border: 1px solid #334155;
+}
+
+.file-icon {
+    width: 40px;
+    height: 40px;
+    background: #1E293B;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: bold;
+    color: #3B82F6;
+}
+
+.file-info {
+    flex: 1;
+}
+
+.file-name {
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.status-dot-processing {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #F59E0B;
+    box-shadow: 0 0 8px rgba(245, 158, 11, 0.5);
+}
+
+.status-dot-success {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #22C55E;
+    box-shadow: 0 0 8px rgba(34, 197, 94, 0.5);
+}
+
+/* --- Review Page Styles --- */
+.review-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    height: 100%;
+}
+
+.left-panel, .right-panel {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0; /* Crucial for scrolling */
+}
+
+.doc-viewer {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.viewer-header {
+    padding: 1rem;
+    border-bottom: 1px solid #334155;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.right-panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.policy-search-input {
+    background: #1E293B;
+    border: 1px solid #334155;
+    padding: 6px 12px;
+    border-radius: 6px;
+    color: white;
+    font-size: 0.875rem;
+}
+
+/* --- Accordion Styles --- */
+.policy-item {
+    background: #1E293B;
+    border-radius: 8px;
+    border: 1px solid #334155;
+    margin-bottom: 0.5rem;
+    overflow: hidden;
+}
+
+.policy-header {
+    padding: 12px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    font-weight: 500;
+    background: #253248;
+}
+
+.policy-content {
+    padding: 0;
+}
+
+.policy-summary-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.policy-summary-table td {
+    padding: 10px 16px;
+    border-bottom: 1px solid #334155;
+    font-size: 0.875rem;
+}
+
+.policy-summary-table td:first-child {
+    color: #94A3B8;
+    width: 40%;
+}
+
+.editable-cell-value {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.action-icon {
+    font-size: 0.7rem;
+    color: #3B82F6;
+    background: none;
+    border: none;
+    cursor: pointer;
+    margin-left: 8px;
+    text-transform: uppercase;
+    opacity: 0.8;
+}
+.action-icon:hover { opacity: 1; text-decoration: underline; }
+
+.edit-input {
+    background: #0F172A;
+    border: 1px solid #3B82F6;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    width: 100%;
+}
+
+.arrow-icon {
+    font-size: 1.2rem;
+    transition: transform 0.2s;
+}
+.rotate-arrow {
+    transform: rotate(90deg);
+}
+
+/* --- Summary Card --- */
+.summary-card {
+    padding: 3rem 2rem;
+}
+
+.summary-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.summary-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin: 2.5rem 0;
+}
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #3B82F6;
+}
+
+.stat-label {
+    color: #94A3B8;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+.download-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+/* --- Progress Modal --- */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+}
+
+.modal-content {
+    background: #1E293B;
+    padding: 2rem;
+    border-radius: 12px;
+    border: 1px solid #334155;
+    width: 400px;
+    text-align: center;
+}
+
+.progress-bar-wrapper {
+    height: 6px;
+    background: #334155;
+    border-radius: 3px;
+    margin: 1rem 0;
+    overflow: hidden;
+}
+
+.progress-bar {
+    height: 100%;
+    background: #3B82F6;
+    transition: width 0.3s ease;
+}

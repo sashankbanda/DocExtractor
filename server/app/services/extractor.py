@@ -90,7 +90,8 @@ def _clean_amount(value: str) -> str:
 def _extract_series(source_text: str, base_field: str, meta: Dict[str, int]) -> Dict[str, str]:
     label = meta["label"]
     count = meta["count"]
-    pattern = re.compile(rf"{label.replace(' ', r'[\s_]*')}[:\s$]*([\d,.\-]+)", re.IGNORECASE)
+    label_regex = label.replace(' ', r'[\s_]*')
+    pattern = re.compile(rf"{label_regex}[:\s$]*([\d,.\-]+)", re.IGNORECASE)
     matches = pattern.findall(source_text)
     result = {}
     for idx, match in enumerate(matches[:count]):
