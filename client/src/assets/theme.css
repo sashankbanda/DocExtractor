@@ -1,0 +1,23 @@
+:root {
+  --primary: #3B82F6;
+  --primary-700: #1D4ED8;
+  --secondary: #22C55E;
+  --error: #EF4444;
+  --bg: #0F172A;
+  --surface: #1E293B;
+  --border: #334155;
+  --text: #F8FAFC;
+  --muted: #94A3B8;
+  --highlight: rgba(59, 130, 246, 0.25);
+  --policy-surface: #1E293B;
+  --claim-section-surface: #141f30;
+  --claim-card-surface: #1a2a3e;
+  --radius-lg: 12px;
+  --radius-md: 8px;
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+* {
+  box-sizing: border-box;
+}
+

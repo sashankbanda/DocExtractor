@@ -1,0 +1,74 @@
+# =========================
+# Global / OS Files
+# =========================
+.DS_Store
+Thumbs.db
+*.log
+.vscode/
+.idea/
+
+# =========================
+# Client (Node/React/Vite)
+# =========================
+# Dependencies
+client/node_modules/
+node_modules/
+
+# Build outputs
+client/dist/
+client/build/
+
+# Vite cache
+.vite/
+
+# Environment variables (Secrets)
+client/.env
+client/.env.local
+client/.env.*.local
+
+# Logs
+npm-debug.log*
+yarn-error.log*
+yarn-debug.log*
+
+# =========================
+# Server (Python/FastAPI)
+# =========================
+# Virtual Environments
+server/.venv/
+venv/
+env/
+
+# Python Bytecode (generated automatically)
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environment variables (Secrets)
+server/.env
+
+# Distribution / Packaging
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# =========================
+# User Data / Uploads
+# =========================
+# Ignore files inside uploads but keep the folder itself
+uploads/*
+!uploads/.gitkeep
+
+server/uploads/*
+!server/uploads/.gitkeep

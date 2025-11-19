@@ -1,0 +1,182 @@
+{
+  "info": {
+    "name": "Document Extractor",
+    "_postman_id": "d2e78f61-6b64-4d33-9ed6-1c8c0e3bfeaa",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_postman_exported_using": "Postman/11.17.0"
+  },
+  "item": [
+    {
+      "name": "Upload File",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "file",
+              "type": "file",
+              "src": ""
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{BASE_URL}}/upload",
+          "host": [
+            "{{BASE_URL}}"
+          ],
+          "path": [
+            "upload"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Start Extraction",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"fileId\": \"{{FILE_ID}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{BASE_URL}}/extract",
+          "host": [
+            "{{BASE_URL}}"
+          ],
+          "path": [
+            "extract"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Get Extracted JSON",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{BASE_URL}}/extracted/{{FILE_ID}}",
+          "host": [
+            "{{BASE_URL}}"
+          ],
+          "path": [
+            "extracted",
+            "{{FILE_ID}}"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Get PDF Page Image",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{BASE_URL}}/page/{{FILE_ID}}/1",
+          "host": [
+            "{{BASE_URL}}"
+          ],
+          "path": [
+            "page",
+            "{{FILE_ID}}",
+            "1"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Save Edit",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"fileId\": \"{{FILE_ID}}\",\n  \"field\": \"policyNumber\",\n  \"value\": \"PN-789654\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{BASE_URL}}/edit",
+          "host": [
+            "{{BASE_URL}}"
+          ],
+          "path": [
+            "edit"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Export JSON",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{BASE_URL}}/export/{{FILE_ID}}?format=json",
+          "host": [
+            "{{BASE_URL}}"
+          ],
+          "path": [
+            "export",
+            "{{FILE_ID}}"
+          ],
+          "query": [
+            {
+              "key": "format",
+              "value": "json"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Export Excel",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{BASE_URL}}/export/{{FILE_ID}}?format=xlsx",
+          "host": [
+            "{{BASE_URL}}"
+          ],
+          "path": [
+            "export",
+            "{{FILE_ID}}"
+          ],
+          "query": [
+            {
+              "key": "format",
+              "value": "xlsx"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "BASE_URL",
+      "value": "http://localhost:8000"
+    },
+    {
+      "key": "FILE_ID",
+      "value": ""
+    },
+    {
+      "key": "TOKEN",
+      "value": ""
+    }
+  ]
+}
+
