@@ -276,19 +276,37 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 8px;
 }
 
 .action-icon {
-    font-size: 0.7rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    padding: 4px;
     color: #3B82F6;
-    background: none;
-    border: none;
+    background: rgba(59, 130, 246, 0.1);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    border-radius: 4px;
     cursor: pointer;
-    margin-left: 8px;
-    text-transform: uppercase;
+    transition: all 0.15s ease;
     opacity: 0.8;
 }
-.action-icon:hover { opacity: 1; text-decoration: underline; }
+
+.action-icon:hover {
+    opacity: 1;
+    background: rgba(59, 130, 246, 0.2);
+    border-color: #3B82F6;
+    transform: translateY(-1px);
+}
+
+.action-icon svg {
+    width: 14px;
+    height: 14px;
+    stroke-width: 2.5;
+}
 
 .edit-input {
     background: #0F172A;
@@ -376,4 +394,77 @@ body {
     height: 100%;
     background: #3B82F6;
     transition: width 0.3s ease;
+}
+
+/* --- Section Styles for Policy Accordion --- */
+.section-group {
+    margin-bottom: 1.5rem;
+    padding: 0 16px;
+}
+
+.section-title {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: #3B82F6;
+    margin: 0 0 12px 0;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #334155;
+}
+
+.field-label {
+    font-weight: 500;
+    color: #94A3B8;
+}
+
+.claims-section-container {
+    background: #141f30;
+    border-radius: 6px;
+    padding: 10px;
+    margin-top: 1rem;
+}
+
+.claims-section-header {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    padding: 8px 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.claim-row-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.claim-detail-content {
+    background: #0F172A;
+    padding: 12px;
+    border-radius: 6px;
+    overflow-y: auto;
+}
+
+.claim-detail-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.claim-detail-table td {
+    padding: 8px 0;
+    border-bottom: 1px dashed #334155;
+    font-size: 0.875rem;
+}
+
+.claim-detail-table td:first-child {
+    color: #94A3B8;
+    width: 40%;
+}
+
+.claim-summary-arrow {
+    transition: transform 0.2s ease;
+    font-weight: 900;
+    color: #94A3B8;
 }

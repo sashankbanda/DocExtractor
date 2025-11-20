@@ -36,6 +36,25 @@ async def get_page(file_id: str, page: int):
     return StreamingResponse(BytesIO(image_bytes), media_type="image/png")
 
 
+@router.get("/page-count/{file_id}")
+async def get_page_count(file_id: str):
+    db = get_db()
+    file_doc = await db.files.find_one({"fileId": file_id})
+    if not file_doc:
+        raise HTTPException(status_code=404, detail="File not found")
+    if not file_doc["filename"].lower().endswith(".pdf"):
+        return {"pageCount": 1}  # Non-PDF files are treated as single page
+    
+    import fitz
+    try:
+        doc = fitz.open(file_doc["path"])
+        page_count = len(doc)
+        doc.close()
+        return {"pageCount": page_count}
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"Unable to get page count: {exc}") from exc
+
+
 @router.post("/edit")
 async def save_edit(payload: EditPayload):
     db = get_db()

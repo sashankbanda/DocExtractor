@@ -20,45 +20,45 @@ DATE_FORMATS = [
 ]
 
 TEXT_PATTERNS = {
-    "policyNumber": r"(?:policy(?:\s+number|\s+no\.?)?[:\s#-]*)([A-Z0-9\-\/]+)",
-    "claimNumber": r"(?:claim(?:\s+number|\s+no\.?)?[:\s#-]*)([A-Z0-9\-\/]+)",
-    "lob": r"(?:line\s+of\s+business|lob)[:\s]+([A-Za-z &/]+)",
-    "insured": r"(?:insured|policyholder)[:\s]+([A-Za-z0-9 .,&'-]+)",
-    "dba": r"(?:dba|doing\s+business\s+as)[:\s]+([A-Za-z0-9 .,&'-]+)",
-    "carrier": r"(?:carrier|insurer)[:\s]+([A-Za-z0-9 .,&'-]+)",
-    "valuedDate": r"(?:valued\s+date)[:\s]+([0-9/.\-]+)",
-    "claimant": r"(?:claimant)[:\s]+([A-Za-z0-9 .,&'-]+)",
-    "claimStatus": r"(?:claim\s+status)[:\s]+([A-Za-z ]+)",
-    "closedDate": r"(?:closed\s+date)[:\s]+([0-9/.\-]+)",
-    "reportedDate": r"(?:reported\s+date)[:\s]+([0-9/.\-]+)",
-    "dateOfLoss": r"(?:date\s+of\s+loss|loss\s+date)[:\s]+([0-9/.\-]+)",
-    "lossDescription": r"(?:loss\s+description)[:\s-]+([\w\s,.()-]{10,200})",
-    "lossLocation": r"(?:loss\s+location)[:\s]+([A-Za-z0-9 .,&'-]+)",
-    "state": r"(?:state)[:\s]+([A-Za-z ]{2,})",
-    "city": r"(?:city)[:\s]+([A-Za-z .'-]+)",
-    "effdate": r"(?:effective\s+date|eff\.?\s*date)[:\s]+([0-9/.\-]+)",
-    "expdate": r"(?:expiration\s+date|exp\.?\s*date)[:\s]+([0-9/.\-]+)",
-    "inferredCurrency": r"(?:currency)[:\s]+([A-Za-z$]{1,5})",
-    "pageNumber": r"(?:page\s+number)[:\s#-]*([0-9]+)",
-    "sheetName": r"(?:sheet\s+name)[:\s-]+([A-Za-z0-9 _-]+)",
+    "policyNumber": r"(?:policy(?:\s+number|\s+no\.?)?[:\s#-]*)([A-Z0-9\-\/]{1,20})(?:\s|$|[,\n])",
+    "claimNumber": r"(?:claim(?:\s+number|\s+no\.?)?[:\s#-]*)([A-Z0-9\-\/]{1,20})(?:\s|$|[,\n])",
+    "lob": r"(?:line\s+of\s+business|lob)[:\s]+([A-Za-z &/]{1,50})(?:\s|$|[,\n])",
+    "insured": r"(?:insured|policyholder)[:\s]+([A-Za-z0-9 .,&'-]{1,100})(?:\s|$|[,\n])",
+    "dba": r"(?:dba|doing\s+business\s+as)[:\s]+([A-Za-z0-9 .,&'-]{1,100})(?:\s|$|[,\n])",
+    "carrier": r"(?:carrier|insurer)[:\s]+([A-Za-z0-9 .,&'-]{1,100})(?:\s|$|[,\n])",
+    "valuedDate": r"(?:valued\s+date)[:\s]+([0-9/.\-]{6,12})(?:\s|$|[,\n])",
+    "claimant": r"(?:claimant)[:\s]+([A-Za-z0-9 .,&'-]{1,50})(?:\s|$|[,\n])",
+    "claimStatus": r"(?:claim\s+status|status)[:\s]+([A-Za-z]{1,20})(?:\s|$|[,\n])",
+    "closedDate": r"(?:closed\s+date)[:\s]+([0-9/.\-]{6,12})(?:\s|$|[,\n])",
+    "reportedDate": r"(?:reported\s+date)[:\s]+([0-9/.\-]{6,12})(?:\s|$|[,\n])",
+    "dateOfLoss": r"(?:date\s+of\s+loss|loss\s+date|dol)[:\s]+([0-9/.\-]{6,12})(?:\s|$|[,\n])",
+    "lossDescription": r"(?:loss\s+description|desc)[:\s-]+([\w\s,.()-]{10,150})(?:\s|$|[,\n])",
+    "lossLocation": r"(?:loss\s+location|location)[:\s]+([A-Za-z0-9 .,&'-]{1,100})(?:\s|$|[,\n])",
+    "state": r"(?:^|\s)(?:state)[:\s]+([A-Za-z]{2,3})(?:\s|$|[,\n])",
+    "city": r"(?:city)[:\s]+([A-Za-z .'-]{1,50})(?:\s|$|[,\n])",
+    "effdate": r"(?:effective\s+date|eff\.?\s*date)[:\s]+([0-9/.\-]{6,12})(?:\s|$|[,\n])",
+    "expdate": r"(?:expiration\s+date|exp\.?\s*date)[:\s]+([0-9/.\-]{6,12})(?:\s|$|[,\n])",
+    "inferredCurrency": r"(?:currency)[:\s]+([A-Za-z$]{1,5})(?:\s|$|[,\n])",
+    "pageNumber": r"(?:page\s+number)[:\s#-]*([0-9]+)(?:\s|$|[,\n])",
+    "sheetName": r"(?:sheet\s+name)[:\s-]+([A-Za-z0-9 _-]{1,50})(?:\s|$|[,\n])",
 }
 
 DATE_FIELDS = {"valuedDate", "closedDate", "reportedDate", "dateOfLoss", "effdate", "expdate"}
 
 SERIES_PATTERNS = {
-    "medicalPaid": {"label": "medical paid", "count": 3},
-    "medicalReserves": {"label": "medical reserves", "count": 3},
-    "indemnityPaid": {"label": "indemnity paid", "count": 6},
-    "indemnityReserves": {"label": "indemnity reserves", "count": 6},
-    "expensesPaid": {"label": "expenses paid", "count": 6},
-    "expensesReserves": {"label": "expenses reserves", "count": 6},
-    "totalPaid": {"label": "total paid", "count": 2},
-    "totalReserve": {"label": "total reserve", "count": 2},
-    "totalIncurredSource": {"label": "total incurred", "count": 1},
-    "recoveries": {"label": "recoveries", "count": 6},
-    "totalMedical": {"label": "total medical", "count": 1},
-    "totalIndemnity": {"label": "total indemnity", "count": 1},
-    "totalExpenses": {"label": "total expenses", "count": 1},
+    "medicalPaid": {"label": "medical paid", "count": 3, "variants": ["med paid", "medical pd", "med pd"]},
+    "medicalReserves": {"label": "medical reserves", "count": 3, "variants": ["med reserves", "medical res", "med res"]},
+    "indemnityPaid": {"label": "indemnity paid", "count": 6, "variants": ["ind paid", "indemnity pd", "ind pd", "indem paid"]},
+    "indemnityReserves": {"label": "indemnity reserves", "count": 6, "variants": ["ind reserves", "indemnity res", "ind res", "indem reserves"]},
+    "expensesPaid": {"label": "expenses paid", "count": 6, "variants": ["exp paid", "expenses pd", "exp pd", "expense paid"]},
+    "expensesReserves": {"label": "expenses reserves", "count": 6, "variants": ["exp reserves", "expenses res", "exp res", "expense reserves"]},
+    "totalPaid": {"label": "total paid", "count": 2, "variants": ["tot paid", "total pd"]},
+    "totalReserve": {"label": "total reserve", "count": 2, "variants": ["tot reserve", "total res", "total reserves"]},
+    "totalIncurredSource": {"label": "total incurred", "count": 1, "variants": ["tot incurred", "total incur", "incurred"]},
+    "recoveries": {"label": "recoveries", "count": 6, "variants": ["recovery", "recovered"]},
+    "totalMedical": {"label": "total medical", "count": 1, "variants": ["tot medical", "total med"]},
+    "totalIndemnity": {"label": "total indemnity", "count": 1, "variants": ["tot indemnity", "total ind"]},
+    "totalExpenses": {"label": "total expenses", "count": 1, "variants": ["tot expenses", "total exp"]},
 }
 
 CRITICAL_FIELDS = ["policyNumber", "claimNumber", "insured", "carrier", "dateOfLoss"]
@@ -87,28 +87,92 @@ def _clean_amount(value: str) -> str:
     return cleaned.strip()
 
 
-def _extract_series(source_text: str, base_field: str, meta: Dict[str, int]) -> Dict[str, str]:
+def _extract_series(source_text: str, base_field: str, meta: Dict) -> Dict[str, str]:
     label = meta["label"]
     count = meta["count"]
-    label_regex = label.replace(' ', r'[\s_]*')
-    pattern = re.compile(rf"{label_regex}[:\s$]*([\d,.\-]+)", re.IGNORECASE)
-    matches = pattern.findall(source_text)
+    variants = meta.get("variants", [])
     result = {}
-    for idx, match in enumerate(matches[:count]):
-        field_name = base_field if idx == 0 else f"{base_field}{idx + 1}"
-        result[field_name] = _clean_amount(match)
+    
+    # Build pattern with all variants
+    all_labels = [label] + variants
+    patterns = []
+    for lbl in all_labels:
+        label_regex = re.escape(lbl).replace(r'\ ', r'[\s_\-]*')
+        # Match with optional number suffix (e.g., "medical paid 2", "medical paid2")
+        patterns.append(rf"{label_regex}[\s_]*(\d+)?[:\s$]*([\d,.\-]+)")
+        # Also match without number (for first item)
+        patterns.append(rf"{label_regex}[:\s$]+([\d,.\-]+)")
+    
+    # Try to find matches with numbered variants first
+    for pattern_str in patterns:
+        pattern = re.compile(pattern_str, re.IGNORECASE)
+        matches = pattern.findall(source_text)
+        for match in matches:
+            if len(match) == 2:  # Has number and value
+                num_str, value = match
+                if num_str:
+                    num = int(num_str)
+                    if num > 1:
+                        field_name = f"{base_field}{num}"
+                    else:
+                        field_name = base_field
+                else:
+                    field_name = base_field
+            else:  # Just value
+                value = match[0] if match else ""
+                field_name = base_field
+            
+            if value and not result.get(field_name):
+                result[field_name] = _clean_amount(value)
+    
+    # Fallback: simple pattern matching for sequential extraction
+    if not result:
+        label_regex = label.replace(' ', r'[\s_\-]*')
+        pattern = re.compile(rf"{label_regex}[\s_]*(\d+)?[:\s$]*([\d,.\-]+)", re.IGNORECASE)
+        matches = pattern.findall(source_text)
+        for match in matches[:count * 2]:  # Get more matches to account for variants
+            if len(match) == 2:
+                num_str, value = match
+                if num_str:
+                    num = int(num_str)
+                    if num > 1 and num <= count:
+                        field_name = f"{base_field}{num}"
+                    else:
+                        field_name = base_field
+                else:
+                    field_name = base_field
+            else:
+                continue
+            
+            if value and not result.get(field_name):
+                result[field_name] = _clean_amount(value)
+    
     return result
 
 
 def rule_based_extract(raw_text: str) -> Dict[str, str]:
     extracted: Dict[str, str] = {}
     for field, pattern in TEXT_PATTERNS.items():
-        match = re.search(pattern, raw_text, re.IGNORECASE | re.MULTILINE | re.DOTALL)
+        match = re.search(pattern, raw_text, re.IGNORECASE | re.MULTILINE)
         if match:
             value = match.group(1).strip()
+            # Clean up value - remove extra whitespace and limit length
+            value = re.sub(r'\s+', ' ', value)
+            # For certain fields, limit length to prevent concatenation
+            max_lengths = {
+                "policyNumber": 30,
+                "claimNumber": 30,
+                "state": 3,
+                "claimStatus": 20,
+                "city": 50,
+                "lob": 50,
+            }
+            if field in max_lengths:
+                value = value[:max_lengths[field]]
             if field in DATE_FIELDS:
                 value = _normalize_date(value)
-            extracted[field] = value
+            if value and value != "":
+                extracted[field] = value
 
     for base_field, meta in SERIES_PATTERNS.items():
         extracted.update(_extract_series(raw_text, base_field, meta))
@@ -120,7 +184,7 @@ def _coverage(fields: Dict[str, str]) -> float:
     if not CRITICAL_FIELDS:
         return 1.0
     hits = sum(1 for field in CRITICAL_FIELDS if fields.get(field))
-    return hits / len(CRITICAL_FIELDS)
+    return hits / len(CRITICAL_FIELDS) if CRITICAL_FIELDS else 1.0
 
 
 async def run_extraction(file_doc: Dict) -> Tuple[Dict, List[Dict]]:
@@ -130,6 +194,8 @@ async def run_extraction(file_doc: Dict) -> Tuple[Dict, List[Dict]]:
 
     text_blocks: List[Dict] = []
     full_text_segments: List[str] = []
+    structured_field_values: Dict[str, str] = {}  # For Excel/CSV structured extraction
+    table_result = None
 
     if doc_type in {DocumentType.DIGITAL_PDF, DocumentType.SCANNED_PDF}:
         pdf_result = pdf_service.extract_text_with_boxes(file_path)
@@ -143,12 +209,28 @@ async def run_extraction(file_doc: Dict) -> Tuple[Dict, List[Dict]]:
         table_result = excel_service.read_table(file_path)
         text_blocks.extend(table_result["blocks"])
         full_text_segments.append(table_result["full_text"])
+        # Extract sheet name if available
+        if "sheet_name" in table_result:
+            structured_field_values["sheetName"] = table_result["sheet_name"]
+        # Extract data from column mappings for structured extraction
+        for block in table_result["blocks"]:
+            if "field" in block and block.get("field") and block.get("text"):
+                field_name = block["field"]
+                value = str(block["text"]).strip()
+                if value and value != "" and not structured_field_values.get(field_name):
+                    structured_field_values[field_name] = value
     else:
         raise ValueError("Unsupported document type")
 
     raw_text = " ".join(segment for segment in full_text_segments if segment)
     normalized = normalize_text(raw_text)
     field_values = rule_based_extract(raw_text)
+    
+    # Merge structured extraction results (Excel/CSV column mappings take precedence)
+    for key, value in structured_field_values.items():
+        if value and value != "":
+            field_values[key] = value
+    
     coverage = _coverage(field_values)
 
     if coverage < 0.65:
