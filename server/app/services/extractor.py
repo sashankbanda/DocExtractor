@@ -20,27 +20,44 @@ DATE_FORMATS = [
 ]
 
 TEXT_PATTERNS = {
-    "policyNumber": r"(?:policy(?:\s+number|\s+no\.?)?[:\s#-]*)([A-Z0-9\-\/]{1,20})(?:\s|$|[,\n])",
-    "claimNumber": r"(?:claim(?:\s+number|\s+no\.?)?[:\s#-]*)([A-Z0-9\-\/]{1,20})(?:\s|$|[,\n])",
-    "lob": r"(?:line\s+of\s+business|lob)[:\s]+([A-Za-z &/]{1,50})(?:\s|$|[,\n])",
-    "insured": r"(?:insured|policyholder)[:\s]+([A-Za-z0-9 .,&'-]{1,100})(?:\s|$|[,\n])",
-    "dba": r"(?:dba|doing\s+business\s+as)[:\s]+([A-Za-z0-9 .,&'-]{1,100})(?:\s|$|[,\n])",
-    "carrier": r"(?:carrier|insurer)[:\s]+([A-Za-z0-9 .,&'-]{1,100})(?:\s|$|[,\n])",
-    "valuedDate": r"(?:valued\s+date)[:\s]+([0-9/.\-]{6,12})(?:\s|$|[,\n])",
-    "claimant": r"(?:claimant)[:\s]+([A-Za-z0-9 .,&'-]{1,50})(?:\s|$|[,\n])",
-    "claimStatus": r"(?:claim\s+status|status)[:\s]+([A-Za-z]{1,20})(?:\s|$|[,\n])",
-    "closedDate": r"(?:closed\s+date)[:\s]+([0-9/.\-]{6,12})(?:\s|$|[,\n])",
-    "reportedDate": r"(?:reported\s+date)[:\s]+([0-9/.\-]{6,12})(?:\s|$|[,\n])",
-    "dateOfLoss": r"(?:date\s+of\s+loss|loss\s+date|dol)[:\s]+([0-9/.\-]{6,12})(?:\s|$|[,\n])",
-    "lossDescription": r"(?:loss\s+description|desc)[:\s-]+([\w\s,.()-]{10,150})(?:\s|$|[,\n])",
-    "lossLocation": r"(?:loss\s+location|location)[:\s]+([A-Za-z0-9 .,&'-]{1,100})(?:\s|$|[,\n])",
-    "state": r"(?:^|\s)(?:state)[:\s]+([A-Za-z]{2,3})(?:\s|$|[,\n])",
-    "city": r"(?:city)[:\s]+([A-Za-z .'-]{1,50})(?:\s|$|[,\n])",
-    "effdate": r"(?:effective\s+date|eff\.?\s*date)[:\s]+([0-9/.\-]{6,12})(?:\s|$|[,\n])",
-    "expdate": r"(?:expiration\s+date|exp\.?\s*date)[:\s]+([0-9/.\-]{6,12})(?:\s|$|[,\n])",
-    "inferredCurrency": r"(?:currency)[:\s]+([A-Za-z$]{1,5})(?:\s|$|[,\n])",
-    "pageNumber": r"(?:page\s+number)[:\s#-]*([0-9]+)(?:\s|$|[,\n])",
-    "sheetName": r"(?:sheet\s+name)[:\s-]+([A-Za-z0-9 _-]{1,50})(?:\s|$|[,\n])",
+    # Policy number - more specific patterns
+    "policyNumber": r"(?:policy(?:\s+number|\s+no\.?)?[:\s#-]*)([A-Z0-9\-\/]{1,30})(?=\s|$|[,\n]|\.|;|Policy|Claim|Insured|Carrier)",
+    # Claim number
+    "claimNumber": r"(?:claim(?:\s+number|\s+no\.?)?[:\s#-]*)([A-Z0-9\-\/]{1,30})(?=\s|$|[,\n]|\.|;|Policy|Claim|Insured)",
+    # Line of business - stop at common delimiters
+    "lob": r"(?:line\s+of\s+business|lob|pac)[:\s]+([A-Za-z &/\-]{1,60})(?=\s|$|[,\n]|Policy|Claim|Insured|Carrier|MCC)",
+    # Insured - more restrictive
+    "insured": r"(?:insured|policyholder)[:\s]+([A-Za-z0-9 .,&'-]{1,80})(?=\s|$|[,\n]|Division|PAC|MCC|Policy|Claim)",
+    # DBA
+    "dba": r"(?:dba|doing\s+business\s+as)[:\s]+([A-Za-z0-9 .,&'-]{1,80})(?=\s|$|[,\n]|Policy|Claim)",
+    # Carrier
+    "carrier": r"(?:carrier|insurer)[:\s]+([A-Za-z0-9 .,&'-]{1,80})(?=\s|$|[,\n]|Policy|Claim|Insured)",
+    # Dates - more specific
+    "valuedDate": r"(?:valued\s+date|valuation\s+date)[:\s]+([0-9]{1,2}[/\-\.][0-9]{1,2}[/\-\.][0-9]{2,4})(?=\s|$|[,\n])",
+    # Claimant - stop at status or other claim fields
+    "claimant": r"(?:claimant)[:\s]+([A-Za-z0-9 .,&'-]{1,50})(?=\s|$|[,\n]|Sts|Status|Gross|Paid|Outstanding)",
+    # Claim status - single letter or word
+    "claimStatus": r"(?:claim\s+status|status|sts)[:\s]+([A-Za-z0-9]{1,10})(?=\s|$|[,\n]|Gross|Paid|Outstanding)",
+    # Dates
+    "closedDate": r"(?:closed\s+date|close\s+date)[:\s]+([0-9]{1,2}[/\-\.][0-9]{1,2}[/\-\.][0-9]{2,4})(?=\s|$|[,\n])",
+    "reportedDate": r"(?:reported\s+date|report\s+date)[:\s]+([0-9]{1,2}[/\-\.][0-9]{1,2}[/\-\.][0-9]{2,4})(?=\s|$|[,\n])",
+    "dateOfLoss": r"(?:date\s+of\s+loss|loss\s+date|dol|event\s+date)[:\s]+([0-9]{1,2}[/\-\.][0-9]{1,2}[/\-\.][0-9]{2,4})(?=\s|$|[,\n])",
+    # Loss description - stop at Claimant or Status
+    "lossDescription": r"(?:loss\s+description|desc|description)[:\s-]+([\w\s,.()-]{10,120})(?=\s|$|[,\n]|Claimant|Sts|Status|Gross)",
+    # Location
+    "lossLocation": r"(?:loss\s+location|location)[:\s]+([A-Za-z0-9 .,&'-]{1,80})(?=\s|$|[,\n]|State|City|Claimant)",
+    # State - 2-3 letter codes only
+    "state": r"(?:^|\s)(?:state)[:\s]+([A-Z]{2,3})(?=\s|$|[,\n]|City|Claimant|Desc|Description)",
+    # City
+    "city": r"(?:city)[:\s]+([A-Za-z .'-]{1,50})(?=\s|$|[,\n]|State|Claimant|Desc)",
+    # Policy dates
+    "effdate": r"(?:effective\s+date|eff\.?\s*date)[:\s]+([0-9]{1,2}[/\-\.][0-9]{1,2}[/\-\.][0-9]{2,4})(?=\s|$|[,\n]|Exp|Expiration)",
+    "expdate": r"(?:expiration\s+date|exp\.?\s*date|exp\s+date)[:\s]+([0-9]{1,2}[/\-\.][0-9]{1,2}[/\-\.][0-9]{2,4})(?=\s|$|[,\n]|Policy|Claim)",
+    # Currency
+    "inferredCurrency": r"(?:currency)[:\s]+([A-Z$]{1,5})(?=\s|$|[,\n])",
+    # Metadata
+    "pageNumber": r"(?:page\s+number|page)[:\s#-]*([0-9]+)(?=\s|$|[,\n])",
+    "sheetName": r"(?:sheet\s+name|sheet)[:\s-]+([A-Za-z0-9 _-]{1,50})(?=\s|$|[,\n])",
 }
 
 DATE_FIELDS = {"valuedDate", "closedDate", "reportedDate", "dateOfLoss", "effdate", "expdate"}
@@ -152,25 +169,57 @@ def _extract_series(source_text: str, base_field: str, meta: Dict) -> Dict[str, 
 
 def rule_based_extract(raw_text: str) -> Dict[str, str]:
     extracted: Dict[str, str] = {}
+    
+    # Split text into sentences/lines for better context
+    # This helps prevent matching across unrelated sections
+    text_lines = re.split(r'[.\n]', raw_text)
+    
     for field, pattern in TEXT_PATTERNS.items():
-        match = re.search(pattern, raw_text, re.IGNORECASE | re.MULTILINE)
-        if match:
-            value = match.group(1).strip()
-            # Clean up value - remove extra whitespace and limit length
+        # Try to find match in each line first (more accurate)
+        best_match = None
+        best_line = None
+        
+        for line in text_lines:
+            if not line.strip():
+                continue
+            match = re.search(pattern, line, re.IGNORECASE)
+            if match:
+                # Prefer shorter matches (less likely to be concatenated)
+                if best_match is None or len(match.group(1)) < len(best_match.group(1)):
+                    best_match = match
+                    best_line = line
+        
+        # Fallback to full text search if no line match found
+        if best_match is None:
+            best_match = re.search(pattern, raw_text, re.IGNORECASE | re.MULTILINE)
+        
+        if best_match:
+            value = best_match.group(1).strip()
+            # Clean up value - remove extra whitespace
             value = re.sub(r'\s+', ' ', value)
-            # For certain fields, limit length to prevent concatenation
+            # Remove trailing punctuation that might have been captured
+            value = re.sub(r'[.,;:]+$', '', value)
+            
+            # For certain fields, apply strict length limits
             max_lengths = {
                 "policyNumber": 30,
                 "claimNumber": 30,
                 "state": 3,
-                "claimStatus": 20,
+                "claimStatus": 10,
                 "city": 50,
-                "lob": 50,
+                "lob": 60,
+                "claimant": 50,
             }
             if field in max_lengths:
                 value = value[:max_lengths[field]]
+            
+            # Validate state codes
+            if field == "state" and len(value) > 3:
+                continue  # Skip invalid state codes
+            
             if field in DATE_FIELDS:
                 value = _normalize_date(value)
+            
             if value and value != "":
                 extracted[field] = value
 

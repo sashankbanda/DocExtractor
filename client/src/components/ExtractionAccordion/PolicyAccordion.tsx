@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useRef } from 'react';
 import { ExtractionRecord, ExtractionField } from '@/types/extraction';
 
 // Field labels for better display
@@ -181,6 +181,8 @@ export default function PolicyAccordion({ record, search, onViewSource, onEditFi
   const [claimExpanded, setClaimExpanded] = useState(true);
   const [editingField, setEditingField] = useState<ExtractionField | null>(null);
   const [draftValue, setDraftValue] = useState('');
+  const inputRef = useRef<HTMLInputElement | null>(null);
+  const isSavingRef = useRef(false);
 
   const normalizedSearch = search.toLowerCase();
   const matchesSearch =
@@ -217,13 +219,82 @@ export default function PolicyAccordion({ record, search, onViewSource, onEditFi
 
   const beginEdit = (field: ExtractionField, value: string) => {
     setEditingField(field);
-    setDraftValue(value);
+    setDraftValue(value || '');
+    // Focus the input after state update
+    setTimeout(() => {
+      if (inputRef.current) {
+        inputRef.current.focus();
+        inputRef.current.select();
+      }
+    }, 10);
+  };
+
+  const setInputRef = (el: HTMLInputElement | null) => {
+    inputRef.current = el;
+    if (el && editingField) {
+      // Focus when ref is set if we're in edit mode
+      setTimeout(() => {
+        el.focus();
+        el.select();
+      }, 10);
+    }
   };
 
   const saveEdit = async () => {
-    if (!editingField) return;
-    await onEditField?.(editingField, draftValue);
-    setEditingField(null);
+    if (!editingField || isSavingRef.current) return;
+    isSavingRef.current = true;
+    try {
+      if (onEditField) {
+        await onEditField(editingField, draftValue);
+      }
+    } catch (error) {
+      console.error('Error saving edit:', error);
+      // Don't close on error, let user retry
+      isSavingRef.current = false;
+      return;
+    } finally {
+      if (isSavingRef.current) {
+        setEditingField(null);
+        setDraftValue('');
+        isSavingRef.current = false;
+      }
+    }
+  };
+
+  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    // Check if the blur is caused by clicking on a button in the same row
+    const relatedTarget = e.relatedTarget as HTMLElement;
+    const currentRow = e.currentTarget.closest('tr');
+    
+    // If clicking on a button in the same row, don't save
+    if (relatedTarget && currentRow?.contains(relatedTarget)) {
+      // Check if it's an action button
+      if (relatedTarget.closest('.action-icon')) {
+        return;
+      }
+    }
+    
+    // Small delay to allow click events to process before saving
+    setTimeout(() => {
+      if (!isSavingRef.current && editingField && document.activeElement !== inputRef.current) {
+        saveEdit();
+      }
+    }, 150);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      e.stopPropagation();
+      isSavingRef.current = true;
+      saveEdit();
+    } else if (e.key === 'Escape') {
+      e.preventDefault();
+      e.stopPropagation();
+      setEditingField(null);
+      setDraftValue('');
+      isSavingRef.current = false;
+    }
   };
 
   return (
@@ -250,12 +321,14 @@ export default function PolicyAccordion({ record, search, onViewSource, onEditFi
                         <td>
                           {isEditing ? (
                             <input
+                              ref={setInputRef}
                               className="edit-input"
                               value={draftValue}
                               onChange={(e) => setDraftValue(e.target.value)}
-                              onBlur={saveEdit}
-                              onKeyDown={(e) => e.key === 'Enter' && saveEdit()}
-                              autoFocus
+                              onBlur={handleBlur}
+                              onKeyDown={handleKeyDown}
+                              onClick={(e) => e.stopPropagation()}
+                              onMouseDown={(e) => e.stopPropagation()}
                             />
                           ) : (
                             <div className="editable-cell-value">
@@ -263,7 +336,10 @@ export default function PolicyAccordion({ record, search, onViewSource, onEditFi
                               <div className="flex items-center gap-2">
                                 <button 
                                   className="action-icon" 
-                                  onClick={() => beginEdit(field, value)}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    beginEdit(field, value);
+                                  }}
                                   title="Edit value"
                                 >
                                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -272,7 +348,10 @@ export default function PolicyAccordion({ record, search, onViewSource, onEditFi
                                 </button>
                                 <button 
                                   className="action-icon" 
-                                  onClick={() => onViewSource?.(field)}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    onViewSource?.(field);
+                                  }}
                                   title="View Source"
                                 >
                                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -308,12 +387,14 @@ export default function PolicyAccordion({ record, search, onViewSource, onEditFi
                         <td>
                           {isEditing ? (
                             <input
+                              ref={setInputRef}
                               className="edit-input"
                               value={draftValue}
                               onChange={(e) => setDraftValue(e.target.value)}
-                              onBlur={saveEdit}
-                              onKeyDown={(e) => e.key === 'Enter' && saveEdit()}
-                              autoFocus
+                              onBlur={handleBlur}
+                              onKeyDown={handleKeyDown}
+                              onClick={(e) => e.stopPropagation()}
+                              onMouseDown={(e) => e.stopPropagation()}
                             />
                           ) : (
                             <div className="editable-cell-value">
@@ -321,7 +402,10 @@ export default function PolicyAccordion({ record, search, onViewSource, onEditFi
                               <div className="flex items-center gap-2">
                                 <button 
                                   className="action-icon" 
-                                  onClick={() => beginEdit(field, value)}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    beginEdit(field, value);
+                                  }}
                                   title="Edit value"
                                 >
                                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -330,7 +414,10 @@ export default function PolicyAccordion({ record, search, onViewSource, onEditFi
                                 </button>
                                 <button 
                                   className="action-icon" 
-                                  onClick={() => onViewSource?.(field)}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    onViewSource?.(field);
+                                  }}
                                   title="View Source"
                                 >
                                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -359,7 +446,7 @@ export default function PolicyAccordion({ record, search, onViewSource, onEditFi
             {claimExpanded && claimEntries.length > 0 && (
               <div className="claim-row-list">
                 <div className="claim-item">
-                  <div className="claim-detail-content" style={{ maxHeight: 600 }}>
+                  <div className="claim-detail-content">
                     <table className="claim-detail-table">
                       <tbody>
                         {claimEntries.map(([field, value]) => {
@@ -374,18 +461,41 @@ export default function PolicyAccordion({ record, search, onViewSource, onEditFi
                                     value={draftValue}
                                     onChange={(e) => setDraftValue(e.target.value)}
                                     onBlur={saveEdit}
-                                    onKeyDown={(e) => e.key === 'Enter' && saveEdit()}
+                                    onKeyDown={handleKeyDown}
+                                    onClick={(e) => e.stopPropagation()}
                                     autoFocus
                                   />
                                 ) : (
                                   <div className="editable-cell-value">
                                     <span>{value}</span>
-                                    <button className="action-icon" onClick={() => beginEdit(field, value)}>
-                                      Edit
-                                    </button>
-                                    <button type="button" className="action-icon" onClick={() => onViewSource?.(field)}>
-                                      View Source
-                                    </button>
+                                    <div className="flex items-center gap-2">
+                                      <button 
+                                        className="action-icon" 
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          beginEdit(field, value);
+                                        }}
+                                        title="Edit value"
+                                      >
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                          <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path>
+                                        </svg>
+                                      </button>
+                                      <button 
+                                        type="button" 
+                                        className="action-icon" 
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          onViewSource?.(field);
+                                        }}
+                                        title="View Source"
+                                      >
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                          <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                                          <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                                        </svg>
+                                      </button>
+                                    </div>
                                   </div>
                                 )}
                               </td>
@@ -416,12 +526,14 @@ export default function PolicyAccordion({ record, search, onViewSource, onEditFi
                         <td>
                           {isEditing ? (
                             <input
+                              ref={setInputRef}
                               className="edit-input"
                               value={draftValue}
                               onChange={(e) => setDraftValue(e.target.value)}
-                              onBlur={saveEdit}
-                              onKeyDown={(e) => e.key === 'Enter' && saveEdit()}
-                              autoFocus
+                              onBlur={handleBlur}
+                              onKeyDown={handleKeyDown}
+                              onClick={(e) => e.stopPropagation()}
+                              onMouseDown={(e) => e.stopPropagation()}
                             />
                           ) : (
                             <div className="editable-cell-value">
@@ -429,7 +541,10 @@ export default function PolicyAccordion({ record, search, onViewSource, onEditFi
                               <div className="flex items-center gap-2">
                                 <button 
                                   className="action-icon" 
-                                  onClick={() => beginEdit(field, value)}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    beginEdit(field, value);
+                                  }}
                                   title="Edit value"
                                 >
                                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -438,7 +553,10 @@ export default function PolicyAccordion({ record, search, onViewSource, onEditFi
                                 </button>
                                 <button 
                                   className="action-icon" 
-                                  onClick={() => onViewSource?.(field)}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    onViewSource?.(field);
+                                  }}
                                   title="View Source"
                                 >
                                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -474,12 +592,14 @@ export default function PolicyAccordion({ record, search, onViewSource, onEditFi
                         <td>
                           {isEditing ? (
                             <input
+                              ref={setInputRef}
                               className="edit-input"
                               value={draftValue}
                               onChange={(e) => setDraftValue(e.target.value)}
-                              onBlur={saveEdit}
-                              onKeyDown={(e) => e.key === 'Enter' && saveEdit()}
-                              autoFocus
+                              onBlur={handleBlur}
+                              onKeyDown={handleKeyDown}
+                              onClick={(e) => e.stopPropagation()}
+                              onMouseDown={(e) => e.stopPropagation()}
                             />
                           ) : (
                             <div className="editable-cell-value">
@@ -487,7 +607,10 @@ export default function PolicyAccordion({ record, search, onViewSource, onEditFi
                               <div className="flex items-center gap-2">
                                 <button 
                                   className="action-icon" 
-                                  onClick={() => beginEdit(field, value)}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    beginEdit(field, value);
+                                  }}
                                   title="Edit value"
                                 >
                                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -496,7 +619,10 @@ export default function PolicyAccordion({ record, search, onViewSource, onEditFi
                                 </button>
                                 <button 
                                   className="action-icon" 
-                                  onClick={() => onViewSource?.(field)}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    onViewSource?.(field);
+                                  }}
                                   title="View Source"
                                 >
                                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -532,12 +658,14 @@ export default function PolicyAccordion({ record, search, onViewSource, onEditFi
                         <td>
                           {isEditing ? (
                             <input
+                              ref={setInputRef}
                               className="edit-input"
                               value={draftValue}
                               onChange={(e) => setDraftValue(e.target.value)}
-                              onBlur={saveEdit}
-                              onKeyDown={(e) => e.key === 'Enter' && saveEdit()}
-                              autoFocus
+                              onBlur={handleBlur}
+                              onKeyDown={handleKeyDown}
+                              onClick={(e) => e.stopPropagation()}
+                              onMouseDown={(e) => e.stopPropagation()}
                             />
                           ) : (
                             <div className="editable-cell-value">
@@ -545,7 +673,10 @@ export default function PolicyAccordion({ record, search, onViewSource, onEditFi
                               <div className="flex items-center gap-2">
                                 <button 
                                   className="action-icon" 
-                                  onClick={() => beginEdit(field, value)}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    beginEdit(field, value);
+                                  }}
                                   title="Edit value"
                                 >
                                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -554,7 +685,10 @@ export default function PolicyAccordion({ record, search, onViewSource, onEditFi
                                 </button>
                                 <button 
                                   className="action-icon" 
-                                  onClick={() => onViewSource?.(field)}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    onViewSource?.(field);
+                                  }}
                                   title="View Source"
                                 >
                                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -590,12 +724,14 @@ export default function PolicyAccordion({ record, search, onViewSource, onEditFi
                         <td>
                           {isEditing ? (
                             <input
+                              ref={setInputRef}
                               className="edit-input"
                               value={draftValue}
                               onChange={(e) => setDraftValue(e.target.value)}
-                              onBlur={saveEdit}
-                              onKeyDown={(e) => e.key === 'Enter' && saveEdit()}
-                              autoFocus
+                              onBlur={handleBlur}
+                              onKeyDown={handleKeyDown}
+                              onClick={(e) => e.stopPropagation()}
+                              onMouseDown={(e) => e.stopPropagation()}
                             />
                           ) : (
                             <div className="editable-cell-value">
@@ -603,7 +739,10 @@ export default function PolicyAccordion({ record, search, onViewSource, onEditFi
                               <div className="flex items-center gap-2">
                                 <button 
                                   className="action-icon" 
-                                  onClick={() => beginEdit(field, value)}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    beginEdit(field, value);
+                                  }}
                                   title="Edit value"
                                 >
                                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -612,7 +751,10 @@ export default function PolicyAccordion({ record, search, onViewSource, onEditFi
                                 </button>
                                 <button 
                                   className="action-icon" 
-                                  onClick={() => onViewSource?.(field)}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    onViewSource?.(field);
+                                  }}
                                   title="View Source"
                                 >
                                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -648,12 +790,14 @@ export default function PolicyAccordion({ record, search, onViewSource, onEditFi
                         <td>
                           {isEditing ? (
                             <input
+                              ref={setInputRef}
                               className="edit-input"
                               value={draftValue}
                               onChange={(e) => setDraftValue(e.target.value)}
-                              onBlur={saveEdit}
-                              onKeyDown={(e) => e.key === 'Enter' && saveEdit()}
-                              autoFocus
+                              onBlur={handleBlur}
+                              onKeyDown={handleKeyDown}
+                              onClick={(e) => e.stopPropagation()}
+                              onMouseDown={(e) => e.stopPropagation()}
                             />
                           ) : (
                             <div className="editable-cell-value">
@@ -661,7 +805,10 @@ export default function PolicyAccordion({ record, search, onViewSource, onEditFi
                               <div className="flex items-center gap-2">
                                 <button 
                                   className="action-icon" 
-                                  onClick={() => beginEdit(field, value)}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    beginEdit(field, value);
+                                  }}
                                   title="Edit value"
                                 >
                                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -670,7 +817,10 @@ export default function PolicyAccordion({ record, search, onViewSource, onEditFi
                                 </button>
                                 <button 
                                   className="action-icon" 
-                                  onClick={() => onViewSource?.(field)}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    onViewSource?.(field);
+                                  }}
                                   title="View Source"
                                 >
                                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">

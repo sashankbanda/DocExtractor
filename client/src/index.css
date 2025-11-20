@@ -200,6 +200,11 @@ body {
     flex-direction: column;
     height: 100%;
     min-height: 0; /* Crucial for scrolling */
+    overflow: hidden; /* Prevent panel overflow */
+}
+
+.right-panel {
+    /* Scrolling handled by inner content div */
 }
 
 .doc-viewer {
@@ -444,7 +449,8 @@ body {
     background: #0F172A;
     padding: 12px;
     border-radius: 6px;
-    overflow-y: auto;
+    overflow-y: visible; /* Remove nested scroll, let parent handle it */
+    max-height: none; /* Remove max-height restriction */
 }
 
 .claim-detail-table {
